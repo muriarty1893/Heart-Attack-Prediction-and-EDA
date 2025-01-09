@@ -54,13 +54,6 @@ We have extended the functionality by integrating a user-friendly interface with
    - Lists nearby hospitals within a 15 km radius.
    - Marks the locations of these hospitals on the map for easy navigation.
 
-## How to Run
-
-1. Access the notebook on Kaggle: [Heart Attack EDA & Prediction Notebook](https://www.kaggle.com/code/namanmanchanda/heart-attack-eda-prediction-90-accuracy/notebook).
-2. Ensure dependencies like `pandas`, `numpy`, and `scikit-learn` are installed.
-3. Download the dataset from Kaggle.
-4. Execute cells sequentially to reproduce results.
-
 ## Applications
 
 This project can serve as:
