@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalp Krizi Tahmin ve Konum</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f7f7f7;
+        }
+        h2, h3 {
+            color: #333;
+        }
+        .map-container {
+            margin-bottom: 20px;
+        }
+        iframe {
+            width: 100%;
+            height: 450px;
+            border: 0;
+        }
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+        .results {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            display: none;
+        }
+        .wrapper {
+            max-width: 100%;
+        }
+        #hospitals {
+            list-style: none;
+            padding: 0;
+        }
+        #hospitals li {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        #locationStatus {
+            margin-bottom: 20px;
+            padding: 10px;
+            border-radius: 4px;
+            display: none;
+        }
+        .loading {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        #predictionForm {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            margin-bottom: 20px;
+            flex: 1;
+        }
+        #predictionForm label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        #predictionForm input {
+            width: 95%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        #predictionForm select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #fff;
+        }
+        #predictionForm button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        #predictionForm button:hover {
+            background-color: #218838;
+        }
+        .container{
+            display: flex;
+            gap: 20px;
+        }
+        #resultsWrapper {
+            flex: 1; /* Sonuçlar ve diğer bilgiler */
+        }
+
+    </style>
+</head>
+<body>
+    <h2>Kalp Krizi Tahmin Formu</h2>
+
+    <div id="locationStatus"></div>
+    <div class="container">
+        <form id="predictionForm">
+            <label>Yaş:</label>
+            <input type="number" name="age" required placeholder="Yaşınızı girin">
+
+            <label for="sex">Cinsiyet:</label>
+            <select name="sex" id="sex" required>
+                <option value="0">Kadın</option>
+                <option value="1">Erkek</option>
+            </select>
+
+            <label>Göğüs Ağrısı Tipi:</label>
+            <select name="cp" required>
+                <option value="0">Tip 0</option>
+                <option value="1">Tip 1</option>
+                <option value="2">Tip 2</option>
+                <option value="3">Tip 3</option>
+            </select>
+
+            <label>Dinlenme Kan Basıncı:</label>
+            <input type="number" name="trestbps" required placeholder="Dinlenme Kan Basıncı">
+
+            <label>Kolesterol Seviyesi:</label>
+            <input type="number" name="chol" required placeholder="Kolesterol Seviyesi">
+
+            <label>Açlık Kan Şekeri:</label>
+            <select name="fbs" required>
+                <option value="0">False</option>
+                <option value="1">True</option>
+            </select>
+
+            <label>Rest ECG:</label>
+            <select name="restecg" required>
+                <option value="0">Normal</option>
+                <option value="1">Anormal</option>
+                <option value="2">Hipertrofik</option>
+            </select>
+
+            <label>Maksimum Kalp Atım Hızı:</label>
+            <input type="number" name="thalach" required placeholder="Maksimum Kalp Atım Hızı">
+
+            <label>Egzersiz ile Ağrı (1: Evet, 0: Hayır):</label>
+            <input type="number" name="exang" required placeholder="Egzersiz ile Ağrı" min="0" max="1">
+
+            <label>ST Depresyonu:</label>
+            <input type="number" name="oldpeak" required placeholder="ST Depresyonu" step="0.1">
+
+            <label>Eğim (0-2):</label>
+            <input type="number" name="slope" required placeholder="Eğim" min="0" max="2">
+
+            <label>Renkli Damar Sayısı (0-4):</label>
+            <input type="number" name="ca" required placeholder="Renkli Damar Sayısı" min="0" max="4">
+
+            <label>THAL:</label>
+            <select name="thal" required>
+                <option value="1">Normal</option>
+                <option value="2">Sabit Hata</option>
+                <option value="3">Ters Hata</option>
+            </select>
+
+            <button type="submit" id="submitBtn" disabled>Konum Bekleniyor...</button>
+        </form>
+
+        <div id="resultsWrapper">
+            <div id="results" class="results">
+                <h3>Sonuçlar:</h3>
+                <p id="prediction"></p>
+                <p id="probability"></p>
+                <p id="doctorAdvice"></p>
+            </div>
+            
+            <div id="mapContainer" class="map-container results">
+                <h3>Konumunuz:</h3>
+                <iframe id="mapFrame" allowfullscreen></iframe>
+            </div>
+        
+        
+            <div id="hospitalsContainer" class="results">
+                <h3>Yakındaki Hastaneler:</h3>
+                <ul id="hospitals"></ul>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        let userLocation = null;
+        const locationStatus = document.getElementById('locationStatus');
+        const submitBtn = document.getElementById('submitBtn');
+
+        if (navigator.geolocation) {
+            locationStatus.style.display = 'block';
+            locationStatus.className = 'loading';
+            locationStatus.textContent = 'Konum alınıyor...';
+
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    userLocation = {
+                        latitude: position.coords.latitude,
+                        longitude: position.coords.longitude
+                    };
+                    locationStatus.style.display = 'none';
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Tahmin Et';
+                },
+                (error) => {
+                    locationStatus.style.display = 'block';
+                    locationStatus.className = 'error';
+                    locationStatus.textContent = 'Konum alınamadı. Lütfen konum izni verin.';
+                }
+            );
+        } else {
+            locationStatus.style.display = 'block';
+            locationStatus.className = 'error';
+            locationStatus.textContent = 'Tarayıcınız konum servisini desteklemiyor.';
+        }
+
+        document.getElementById('predictionForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            if (!userLocation) {
+                alert('Konum bilgisi alınamadı. Lütfen konum izni verdiğinizden emin olun.');
+                return;
+            }
+
+            const formData = new FormData(e.target);
+            const data = {
+                ...Object.fromEntries(formData),
+                ...userLocation
+            };
+
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    document.getElementById('results').style.display = 'block';
+                    document.getElementById('prediction').textContent = `Tahmin: ${result.prediction}`;
+                    document.getElementById('probability').textContent = `İhtimal: ${result.probability}%`;
+                    document.getElementById('doctorAdvice').textContent = `Öneri: ${result.doctor_advice}`;
+
+                    if (result.hospitals && result.hospitals.length > 0) {
+                        document.getElementById('hospitalsContainer').style.display = 'block';
+                        const hospitalsList = document.getElementById('hospitals');
+                        hospitalsList.innerHTML = result.hospitals.map(hospital =>
+                            `<li>
+                                <strong>${hospital.name}</strong><br>
+                                ${hospital.address}
+                            </li>`
+                        ).join('');
+                    }
+
+                    if (result.map_url) {
+                        document.getElementById('mapContainer').style.display = 'block';
+                        document.getElementById('mapFrame').src = result.map_url;
+                    }
+                } else {
+                    alert(`Hata: ${result.error}`);
+                }
+            } catch (error) {
+                alert('Bir hata oluştu. Lütfen daha sonra tekrar deneyin.');
+            }
+        });
+    </script>
+</body>
+</html>
