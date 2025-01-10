@@ -1,6 +1,6 @@
-# Heart Attack EDA & Prediction (90% Accuracy)
+# Heart Attack EDA & Prediction (88% Accuracy)
 
-This project demonstrates exploratory data analysis (EDA) and prediction modeling on a heart attack dataset to identify risk factors and predict the likelihood of a heart attack with an impressive accuracy of 90%. The notebook is hosted on Kaggle and serves as a comprehensive guide to understanding the dataset and building machine learning models for medical predictions.
+This project demonstrates exploratory data analysis (EDA) and prediction modeling on a heart attack dataset to identify risk factors and predict the likelihood of a heart attack with an impressive accuracy of 88%. The notebook is hosted on Kaggle and serves as a comprehensive guide to understanding the dataset and building machine learning models for medical predictions.
 
 ## Dataset Description
 
@@ -41,7 +41,7 @@ The workflow involves:
 
 ## Key Insights
 
-- The logistic regression model achieved the highest accuracy of 90%.
+- The logistic regression model achieved the highest accuracy of 88%.
 - Features such as age, chest pain type, and maximum heart rate significantly impact predictions.
 - The dataset is relatively balanced, ensuring fair model evaluation.
 
